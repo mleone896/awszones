@@ -44,6 +44,8 @@ func New() *Conn {
 
 func main() {
 
+	// TODO(mleone896): add distinction between public and private zones
+
 	c := New()
 
 	log.Printf("querying all route53 zones")
@@ -58,7 +60,7 @@ func main() {
 		}
 
 		for _, record := range z.Records {
-			fmt.Printf("record_name: %s record_type: %s\n", record.Name, record.Type)
+			fmt.Printf("record: %s       type: %s\n", record.Name, record.Type)
 
 		}
 	}
