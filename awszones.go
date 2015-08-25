@@ -49,6 +49,18 @@ func main() {
 	log.Printf("querying all route53 zones")
 	zones := c.HostedZones()
 
-	fmt.Println(zones)
+	for id, _ := range zones {
+
+		z, err := c.r53.ListResourceRecordSets(id, nil)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, record := range z.Records {
+			fmt.Printf("record_name: %s record_type: %s\n", record.Name, record.Type)
+
+		}
+	}
 
 }
