@@ -22,7 +22,7 @@ func (c *Conn) HostedZones() (ZoneMap map[string]string) {
 	}
 
 	for _, val := range zones.HostedZones {
-		ZoneMap[val.Name] = route53.CleanZoneID(val.ID)
+		ZoneMap[route53.CleanZoneID(val.ID)] = val.Name
 	}
 
 	return ZoneMap
