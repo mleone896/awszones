@@ -12,9 +12,9 @@ type Conn struct {
 	r53 *route53.Route53
 }
 
-func (c *Conn) HostedZones() []string {
+func (c *Conn) HostedZones() (ZoneMap map[string]string) {
 
-	var Zones []string
+	ZoneMap = make(map[string]string)
 
 	zones, err := c.r53.ListHostedZones("", 50)
 	if err != nil {
@@ -22,10 +22,10 @@ func (c *Conn) HostedZones() []string {
 	}
 
 	for _, val := range zones.HostedZones {
-		Zones = append(Zones, val.Name)
+		ZoneMap[val.Name] = route53.CleanZoneID(val.ID)
 	}
 
-	return Zones
+	return ZoneMap
 }
 
 func New() *Conn {
@@ -49,8 +49,6 @@ func main() {
 	log.Printf("querying all route53 zones")
 	zones := c.HostedZones()
 
-	for _, val := range zones {
-		fmt.Println(val)
-	}
+	fmt.Println(zones)
 
 }
