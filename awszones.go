@@ -60,7 +60,7 @@ func main() {
 		}
 
 		for _, record := range z.Records {
-			fmt.Printf("record: %s       type: %s\n", record.Name, record.Type)
+			fmt.Printf("record: %-6s  type: %6s\n", record.Name, record.Type)
 
 		}
 	}
