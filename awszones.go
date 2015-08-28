@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/mitchellh/goamz/aws"
 	"github.com/mitchellh/goamz/route53"
@@ -28,6 +29,23 @@ func (c *Conn) HostedZones() (ZoneMap map[string]string) {
 	return ZoneMap
 }
 
+func (c *Conn) RecordTypeMap(zones map[string]string) (recordMap map[string]string) {
+	recordMap = make(map[string]string)
+	for id, _ := range zones {
+
+		z, err := c.r53.ListResourceRecordSets(id, nil)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, record := range z.Records {
+			recordMap[record.Name] = record.Type
+		}
+	}
+	return recordMap
+}
+
 func New() *Conn {
 
 	c := new(Conn)
@@ -42,27 +60,26 @@ func New() *Conn {
 
 }
 
-func main() {
-
-	// TODO(mleone896): add distinction between public and private zones
-
-	c := New()
-
-	log.Printf("querying all route53 zones")
+func (c *Conn) Records(w http.ResponseWriter, r *http.Request) {
 	zones := c.HostedZones()
 
-	for id, _ := range zones {
+	records := c.RecordTypeMap(zones)
 
-		z, err := c.r53.ListResourceRecordSets(id, nil)
+	out, _ := json.Marshal(records)
 
-		if err != nil {
-			log.Fatal(err)
-		}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(out))
 
-		for _, record := range z.Records {
-			fmt.Printf("record: %-6s  type: %6s\n", record.Name, record.Type)
+}
 
-		}
-	}
+func main() {
+	c := New()
+
+	// TODO(mleone896): add distinction between public and private zones
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/records", c.Records)
+
+	http.ListenAndServe(":9999", mux)
 
 }
