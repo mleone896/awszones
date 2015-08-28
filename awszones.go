@@ -65,7 +65,7 @@ func (c *Conn) Records(w http.ResponseWriter, r *http.Request) {
 
 	records := c.RecordTypeMap(zones)
 
-	out, _ := json.Marshal(records)
+	out, _ := json.MarshalIndent(records, "", "   ")
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(out))
