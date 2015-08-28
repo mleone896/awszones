@@ -76,10 +76,10 @@ func main() {
 	c := New()
 
 	// TODO(mleone896): add distinction between public and private zones
-	mux := http.NewServeMux()
+	//mux := http.NewServeMux()
 
-	mux.HandleFunc("/records", c.Records)
+	http.HandleFunc("/records", c.Records)
 
-	http.ListenAndServe(":9999", mux)
+	http.ListenAndServe(":8080", nil)
 
 }
